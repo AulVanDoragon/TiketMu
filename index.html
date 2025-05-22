@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Sistem Penjualan Tiket Online</title>
+<style>
+  /* Reset and base styles */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 350px;
+    margin: auto;
+    padding: 20px 10px 40px;
+    user-select: none;
+  }
+
+  /* Header styles */
+  header {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  
+  header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  }
+  
+  header p {
+    font-size: 0.9rem;
+    margin-top: 6px;
+    font-weight: 300;
+    opacity: 0.85;
+  }
+
+  /* Categories grid */
+  .categories {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    width: 100%;
+    margin-bottom: 30px;
+  }
+
+  .category-card {
+    background: rgba(255,255,255,0.15);
+    border-radius: 14px;
+    box-shadow: 0 8px 17px rgba(0,0,0,0.12);
+    padding: 18px 14px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: background 0.3s ease, transform 0.3s ease;
+    height: 110px;
+    user-select: none;
+  }
+
+  .category-card:hover, 
+  .category-card:focus {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-4px);
+    outline: none;
+  }
+
+  .category-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+
+  .category-desc {
+    font-size: 0.8rem;
+    font-weight: 400;
+    opacity: 0.9;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  /* Button styles */
+  button {
+    border: none;
+    border-radius: 10px;
+    padding: 8px 14px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    user-select: none;
+  }
+
+  button.buy-btn {
+    background: #ff6363;
+    box-shadow: 0 4px 12px rgba(255,99,99,0.45);
+    align-self: center;
+    width: 80%;
+    max-width: 160px;
+  }
+
+  button.buy-btn:hover, 
+  button.buy-btn:focus {
+    background: #e04e4e;
+    outline: none;
+  }
+
+  button.back-btn {
+    background: #3a3a3a;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  }
+
+  button.back-btn:hover, 
+  button.back-btn:focus {
+    background: #555;
+    outline: none;
+  }
+
+  /* Tickets panel */
+  #tickets-panel {
+    width: 100%;
+    display: none;
+    flex-direction: column;
+  }
+  
+  #tickets-panel.active {
+    display: flex;
+  }
+
+  .tickets-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .tickets-header h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  }
+
+  .tickets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .ticket-card {
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 15px 14px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    transition: background 0.3s ease;
+    cursor: default;
+    position: relative;
+  }
+
+  .ticket-card:hover {
+    background: rgba(255,255,255,0.3);
+  }
+
+  .ticket-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .ticket-details {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    margin-bottom: 12px;
+  }
+
+  .ticket-price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ff9090;
+  }
+
+  /* Order form styles */
+  #order-form {
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  
+  #order-form.active {
+    display: flex;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .form-group input, 
+  .form-group select {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255,255,255,0.9);
+    font-size: 0.9rem;
+  }
+
+  .form-group input:focus, 
+  .form-group select:focus {
+    outline: 2px solid #667eea;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+
+  button.submit-btn {
+    background: #4CAF50;
+    box-shadow: 0 4px 12px rgba(76,175,80,0.45);
+  }
+
+  button.submit-btn:hover, 
+  button.submit-btn:focus {
+    background: #3e8e41;
+  }
+
+  button.cancel-btn {
+    background: #f44336;
+    box-shadow: 0 4px 12px rgba(244,67,54,0.45);
+  }
+
+  button.cancel-btn:hover, 
+  button.cancel-btn:focus {
+    background: #d32f2f;
+  }
+
+  /* Confirmation message */
+  .confirmation {
+    display: none;
+    background: rgba(255,255,255,0.15);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .confirmation.active {
+    display: block;
+  }
+
+  .confirmation h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #4CAF50;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 400px) {
+    body {
+      max-width: 100vw;
+      padding: 15px 10px 30px;
+    }
+    
+    .categories {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    
+    .category-card {
+      height: 100px;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>TiketMu</h1>
+  <p id="header-desc">Pilih kategori tiket favoritmu dengan mudah</p>
+</header>
+
+<div class="categories" role="list" aria-label="Daftar kategori tiket">
+  <div class="category-card" tabindex="0" role="button" aria-pressed="false" data-category="konser" aria-label="Kategori Tiket Konser">
+    <div class="category-title">Tiket Konser</div>
+    <div class="category-desc">Dari musik pop, rock hingga jazz</div>
+  </div>
+  <div class="category-card" tabindex="0" role="button" aria-pressed="false" data-category="olahraga" aria-label="Kategori Tiket Olahraga">
+    <div class="category-title">Tiket Olahraga</div>
+    <div class="category-desc">Pertandingan sepak bola, basket, dan lainnya</div>
+  </div>
+  <div class="category-card" tabindex="0" role="button" aria-pressed="false" data-category="teater" aria-label="Kategori Tiket Teater">
+    <div class="category-title">Tiket Teater</div>
+    <div class="category-desc">Drama, musikal, dan pertunjukan seni lainnya</div>
+  </div>
+  <div class="category-card" tabindex="0" role="button" aria-pressed="false" data-category="festival" aria-label="Kategori Tiket Festival">
+    <div class="category-title">Tiket Festival</div>
+    <div class="category-desc">Festival budaya dan kuliner seru</div>
+  </div>
+</div>
+
+<div id="tickets-panel" role="region" aria-live="polite" aria-label="Daftar tiket tersedia">
+  <div class="tickets-header">
+    <h2 id="tickets-category-title">Kategori</h2>
+    <button class="back-btn" id="back-to-categories" aria-label="Kembali ke daftar kategori tiket">Kembali</button>
+  </div>
+  <div class="tickets-list" id="tickets-list" tabindex="0">
+    <!-- tickets inserted here dynamically -->
+  </div>
+  
+  <!-- Order form -->
+  <div id="order-form" role="form" aria-label="Formulir pemesanan tiket">
+    <h3>Data Pemesanan</h3>
+    <div class="form-group">
+      <label for="name">Nama Lengkap</label>
+      <input type="text" id="name" required placeholder="Masukkan nama lengkap">
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" required placeholder="Masukkan alamat email">
+    </div>
+    <div class="form-group">
+      <label for="phone">Nomor Telepon</label>
+      <input type="tel" id="phone" required placeholder="Masukkan nomor telepon">
+    </div>
+    <div class="form-group">
+      <label for="quantity">Jumlah Tiket</label>
+      <select id="quantity" required>
+        <option value="" disabled selected>Pilih jumlah</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="cancel-btn" id="cancel-order">Batal</button>
+      <button class="submit-btn" id="submit-order">Pesan Tiket</button>
+    </div>
+  </div>
+  
+  <!-- Confirmation message -->
+  <div class="confirmation" id="confirmation-message">
+    <h3>Pemesanan Berhasil!</h3>
+    <p id="confirmation-details">Detail pemesanan akan dikirim ke email Anda.</p>
+    <button class="back-btn" id="back-to-tickets">Kembali ke Daftar Tiket</button>
+  </div>
+</div>
+
+<footer>
+  &copy; 2025 Sistem Penjualan Tiket Online By Eka Satrio Pardede. All rights reserved.
+</footer>
+
+<script>
+  // Data for tickets per category (Sample tickets)
+  const ticketsData = {
+    konser: [
+      {name: 'Konser Pop Night', details: 'Stadion Gelora Bung Karno, 25 Mei 2024', price: 'Rp 350.000'},
+      {name: 'Jazz & Blues Festival', details: 'Teater Terbuka, 12 Juni 2024', price: 'Rp 275.000'},
+      {name: 'Rock Legends Live', details: 'Arena Convention Center, 5 Juli 2024', price: 'Rp 400.000'},
+    ],
+    olahraga: [
+      {name: 'Pertandingan Sepak Bola', details: 'Stadion Utama, 14 Mei 2024', price: 'Rp 150.000'},
+      {name: 'Kejuaraan Basket Nasional', details: 'GOR Basket, 28 Mei 2024', price: 'Rp 180.000'},
+      {name: 'Turnamen Bulutangkis', details: 'Lapangan Serbaguna, 15 Juni 2024', price: 'Rp 120.000'},
+    ],
+    teater: [
+      {name: 'Drama Klasik Indonesia', details: 'Teater Kota, 20 Mei 2024', price: 'Rp 250.000'},
+      {name: 'Musikal Broadway', details: 'Balai Seni, 10 Juni 2024', price: 'Rp 300.000'},
+      {name: 'Pertunjukan Tari Tradisional', details: 'Pusat Kebudayaan, 27 Juni 2024', price: 'Rp 200.000'},
+    ],
+    festival: [
+      {name: 'Festival Kuliner Nusantara', details: 'Alun-Alun Kota, 3 Mei 2024', price: 'Rp 50.000'},
+      {name: 'Festival Budaya Bali', details: 'Pantai Sanur, 17 Mei 2024', price: 'Rp 75.000'},
+      {name: 'Festival Musik Indie', details: 'Taman Hiburan, 22 Juni 2024', price: 'Rp 125.000'},
+    ],
+  };
+
+  // DOM elements
+  const categoriesEl = document.querySelector('.categories');
+  const ticketsPanelEl = document.getElementById('tickets-panel');
+  const ticketsListEl = document.getElementById('tickets-list');
+  const backBtn = document.getElementById('back-to-categories');
+  const ticketsCategoryTitleEl = document.getElementById('tickets-category-title');
+  const headerDescEl = document.getElementById('header-desc');
+  const orderFormEl = document.getElementById('order-form');
+  const confirmationEl = document.getElementById('confirmation-message');
+  const cancelOrderBtn = document.getElementById('cancel-order');
+  const submitOrderBtn = document.getElementById('submit-order');
+  const backToTicketsBtn = document.getElementById('back-to-tickets');
+  const confirmationDetailsEl = document.getElementById('confirmation-details');
+
+  // Current selected ticket
+  let selectedTicket = null;
+
+  // Map category key to display name for header
+  const categoryNames = {
+    konser: "Tiket Konser",
+    olahraga: "Tiket Olahraga",
+    teater: "Tiket Teater",
+    festival: "Tiket Festival"
+  };
+
+  // Render tickets for a selected category
+  function renderTickets(categoryKey) {
+    const tickets = ticketsData[categoryKey] || [];
+    ticketsListEl.innerHTML = '';
+    
+    if (tickets.length === 0) {
+      ticketsListEl.innerHTML = '<p>Tidak ada tiket tersedia untuk kategori ini.</p>';
+      return;
+    }
+    
+    tickets.forEach(ticket => {
+      const ticketCard = document.createElement('div');
+      ticketCard.className = 'ticket-card';
+      ticketCard.tabIndex = 0;
+
+      ticketCard.innerHTML = `
+        <div class="ticket-name">${ticket.name}</div>
+        <div class="ticket-details">${ticket.details}</div>
+        <div class="ticket-price">${ticket.price}</div>
+        <button class="buy-btn" data-ticket='${JSON.stringify(ticket)}'>Beli Tiket</button>
+      `;
+      
+      ticketsListEl.appendChild(ticketCard);
+    });
+
+    // Add event listeners to buy buttons
+    document.querySelectorAll('.buy-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectedTicket = JSON.parse(btn.dataset.ticket);
+        showOrderForm();
+      });
+    });
+  }
+
+  // Show order form
+  function showOrderForm() {
+    ticketsListEl.style.display = 'none';
+    orderFormEl.classList.add('active');
+    document.getElementById('name').focus();
+  }
+
+  // Hide order form
+  function hideOrderForm() {
+    orderFormEl.classList.remove('active');
+    ticketsListEl.style.display = 'flex';
+  }
+
+  // Show confirmation message
+  function showConfirmation() {
+    orderFormEl.classList.remove('active');
+    confirmationEl.classList.add('active');
+    
+    const name = document.getElementById('name').value;
+    const quantity = document.getElementById('quantity').value;
+    
+    confirmationDetailsEl.textContent = `Terima kasih ${name}! Anda telah memesan ${quantity} tiket untuk ${selectedTicket.name}. Detail pemesanan akan dikirim ke email Anda.`;
+  }
+
+  // Show tickets panel for clicked category
+  function showTicketsPanel(categoryKey) {
+    categoriesEl.style.display = 'none';
+    ticketsCategoryTitleEl.textContent = categoryNames[categoryKey] || 'Kategori';
+    headerDescEl.style.display = 'none';
+    ticketsPanelEl.classList.add('active');
+    renderTickets(categoryKey);
+    backBtn.focus();
+  }
+
+  // Show categories list again and hide tickets
+  function showCategories() {
+    ticketsPanelEl.classList.remove('active');
+    categoriesEl.style.display = 'grid';
+    headerDescEl.style.display = 'block';
+    orderFormEl.classList.remove('active');
+    confirmationEl.classList.remove('active');
+    ticketsListEl.style.display = 'flex';
+    
+    // Reset form
+    document.getElementById('order-form').reset();
+    
+    // Set aria-pressed false for all category cards
+    document.querySelectorAll('.category-card').forEach(card => card.setAttribute('aria-pressed', 'false'));
+    
+    // Focus first category card
+    const firstCard = document.querySelector('.category-card');
+    if(firstCard) firstCard.focus();
+  }
+
+  // Event listeners
+  categoriesEl.addEventListener('click', e => {
+    const card = e.target.closest('.category-card');
+    if (card) {
+      card.setAttribute('aria-pressed', 'true');
+      const category = card.getAttribute('data-category');
+      showTicketsPanel(category);
+    }
+  });
+
+  // Support keyboard accessibility for categories (Enter and Space to activate)
+  categoriesEl.addEventListener('keydown', e => {
+    if (e.target.classList.contains('category-card') && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      e.target.click();
+    }
+  });
+
+  backBtn.addEventListener('click', showCategories);
+  backBtn.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      showCategories();
+    }
+  });
+
+  cancelOrderBtn.addEventListener('click', hideOrderForm);
+  backToTicketsBtn.addEventListener('click', () => {
+    confirmationEl.classList.remove('active');
+    ticketsListEl.style.display = 'flex';
+  });
+
+  submitOrderBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    // Simple validation
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const quantity = document.getElementById('quantity').value;
+    
+    if (!name || !email || !phone || !quantity) {
+      alert('Harap lengkapi semua data pemesanan!');
+      return;
+    }
+    
+    showConfirmation();
+  });
+
+  // Initially show categories
+  showCategories();
+</script>
+</body>
+</html>
